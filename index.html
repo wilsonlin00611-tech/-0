@@ -1,0 +1,94 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>3D 寶可夢中文圖鑑對戰</title>
+    <style>
+        :root { --primary-red: #ff4757; --dark-bg: #121212; }
+        
+        * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+        
+        body {
+            margin: 0; background: var(--dark-bg); color: #fff;
+            font-family: "PingFang TC", "Microsoft JhengHei", sans-serif;
+            overflow: hidden; touch-action: pan-y; user-select: none;
+        }
+
+        /* 導覽與狀態 */
+        #ui-layer {
+            position: absolute; top: 0; width: 100%; z-index: 100;
+            text-align: center; padding: 20px;
+            background: linear-gradient(to bottom, rgba(0,0,0,0.8), transparent);
+        }
+        button {
+            padding: 12px 24px; font-size: 18px; font-weight: bold;
+            border: none; border-radius: 50px; cursor: pointer;
+            background: var(--primary-red); color: white; transition: 0.3s;
+        }
+        button:disabled { background: #555; cursor: wait; }
+
+        /* 第一階段：3D 舞台 */
+        #phase-select {
+            height: 100vh; display: flex; justify-content: center; align-items: center;
+            perspective: 1200px;
+        }
+        .carousel-container {
+            width: 220px; height: 320px; position: relative;
+            transform-style: preserve-3d; transition: transform 0.1s linear;
+        }
+        .card {
+            position: absolute; width: 220px; height: 320px;
+            background: #2f3542; border: 2px solid #57606f; border-radius: 15px;
+            display: flex; flex-direction: column; align-items: center; padding: 15px;
+            box-shadow: 0 10px 25px rgba(0,0,0,0.5); backface-visibility: hidden;
+        }
+        .card img { width: 140px; height: 140px; object-fit: contain; pointer-events: none; }
+        .type-tag { 
+            padding: 2px 10px; border-radius: 4px; font-size: 12px; 
+            margin: 5px; background: #57606f; 
+        }
+
+        /* 第二階段：戰鬥 RWD */
+        #phase-battle {
+            display: none; height: 100vh; padding: 20px;
+            flex-direction: row; justify-content: space-around; align-items: center;
+        }
+        .battle-log {
+            width: 300px; height: 400px; background: #000; color: #00ff00;
+            padding: 15px; overflow-y: auto; font-family: monospace;
+            border: 2px solid #333; border-radius: 8px; font-size: 14px;
+        }
+        .hp-bar-outer { width: 100%; height: 12px; background: #444; border-radius: 6px; margin-top: 10px; overflow: hidden; }
+        .hp-bar-inner { width: 100%; height: 100%; background: #2ecc71; transition: 0.5s; }
+
+        /* 手機版 RWD 排版切換 */
+        @media (max-width: 768px) {
+            #phase-battle { flex-direction: column; }
+            .carousel-container { transform: scale(0.65); }
+            .p-player { order: 3; }
+            .battle-log { order: 2; width: 90%; height: 150px; margin: 20px 0; }
+            .p-enemy { order: 1; }
+        }
+    </style>
+</head>
+<body>
+
+<div id="ui-layer">
+    <h2 id="msg">正在下載全國中文圖鑑...</h2>
+    <button id="main-btn" disabled onclick="drawCards()">隨機抽取 5 張卡牌</button>
+</div>
+
+<div id="phase-select">
+    <div class="carousel-container" id="stage"></div>
+</div>
+
+<div id="phase-battle">
+    <div class="p-player" id="player-slot"></div>
+    <div class="battle-log" id="log"></div>
+    <div class="p-enemy" id="enemy-slot"></div>
+</div>
+
+<script src="app.js"></script>
+</body>
+</html>
